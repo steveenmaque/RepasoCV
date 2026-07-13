@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import ExamenCard from '../components/ExamenCard.astro';
+import { examenes } from '../data';
+---
+
+<Base title="Exámenes — RepasoCV" active="examenes">
+  <section class="section container" style="padding-top:56px;">
+    <div class="section-head">
+      <span class="pill examenes">Exámenes</span>
+      <h2>Simulacros para el Examen Final</h2>
+    </div>
+    <p style="color:var(--text-dim);max-width:760px;margin:-6px 0 10px;">
+      Exámenes de práctica con el <b>mismo formato del examen parcial del curso</b>: una gran sección
+      de <b>Verdadero/Falso teórico</b> seguida de <b>ejercicios de aplicación</b> (obtener matrices,
+      evaluar curvas, calcular intensidades, trazar proyecciones…) con solución paso a paso.
+      Predomina la aplicación sobre la demostración, tal como los toma el profesor.
+    </p>
+    <p style="color:var(--text-mute);max-width:760px;margin:0 0 26px;font-size:0.9rem;">
+      Cada simulacro cita el libro de Computación Gráfica del que se inspiran sus problemas.
+      Marca tus respuestas de V/F, pulsa <b>Corregir</b> y contrasta con la explicación.
+    </p>
+    <div class="grid">
+      {examenes.map((e) => <ExamenCard examen={e} />)}
+    </div>
+  </section>
+</Base>

@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import TemaCard from '../components/TemaCard.astro';
-import { teoria, exposiciones, stats } from '../data';
+import ExamenCard from '../components/ExamenCard.astro';
+import { teoria, exposiciones, examenes, stats } from '../data';
 ---
 
 <Base title="RepasoCV — Guía de estudio de Computación Visual" active="inicio">
@@ -9,19 +10,35 @@ import { teoria, exposiciones, stats } from '../data';
     <span class="eyebrow">Computación Visual · UNMSM · Examen Final</span>
     <h1>Repasa <span class="grad">toda la Computación Visual</span> en un solo lugar</h1>
     <p>
-      Teoría condensada, fórmulas clave, imágenes, ejercicios de nivel medio–difícil y cuestionarios
-      interactivos por cada tema de <b>Teoría</b> y de las <b>Exposiciones</b> del curso.
+      Teoría condensada, fórmulas clave, imágenes, ejercicios de nivel medio–difícil, cuestionarios
+      interactivos y <b>simulacros de examen</b> con el mismo formato del curso: Verdadero/Falso
+      teórico y ejercicios de aplicación con solución.
     </p>
     <div class="cta">
-      <a class="btn btn-primary" href="/teoria">Empezar por Teoría</a>
-      <a class="btn btn-ghost" href="/exposiciones">Ver Exposiciones</a>
+      <a class="btn btn-primary" href="/examenes">Practicar Exámenes</a>
+      <a class="btn btn-ghost" href="/teoria">Empezar por Teoría</a>
     </div>
 
     <div class="stats">
       <div class="stat"><div class="n">{stats.temas}</div><div class="l">Temas</div></div>
-      <div class="stat"><div class="n">{stats.preguntas}</div><div class="l">Preguntas</div></div>
-      <div class="stat"><div class="n">{stats.ejercicios}</div><div class="l">Ejercicios</div></div>
+      <div class="stat"><div class="n">{stats.examenes}</div><div class="l">Exámenes</div></div>
+      <div class="stat"><div class="n">{stats.ejercicios + stats.preguntasExamen}</div><div class="l">Ejercicios y preguntas</div></div>
       <div class="stat"><div class="n">{stats.formulas}</div><div class="l">Fórmulas</div></div>
+    </div>
+  </section>
+
+  <section class="section container">
+    <div class="section-head">
+      <span class="pill examenes">Exámenes</span>
+      <h2>Simulacros para el examen final</h2>
+    </div>
+    <p style="color:var(--text-dim);max-width:720px;margin:-6px 0 22px;">
+      Con el <b>formato real del profesor</b>: gran bloque de <b>Verdadero/Falso</b> teórico +
+      <b>ejercicios de aplicación</b> (obtener matrices, evaluar curvas, calcular iluminación) con
+      solución paso a paso. Inspirados en libros clásicos de Computación Gráfica.
+    </p>
+    <div class="grid">
+      {examenes.map((e) => <ExamenCard examen={e} />)}
     </div>
   </section>
 

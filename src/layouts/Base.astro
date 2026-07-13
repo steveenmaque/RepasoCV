@@ -5,7 +5,7 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
-  active?: 'inicio' | 'teoria' | 'exposiciones';
+  active?: 'inicio' | 'teoria' | 'exposiciones' | 'examenes';
 }
 const { title, description = 'Guía de estudio interactiva de Computación Visual — UNMSM. Teoría, fórmulas, ejercicios y cuestionarios.', active } = Astro.props;
 ---
@@ -31,6 +31,7 @@ const { title, description = 'Guía de estudio interactiva de Computación Visua
           <a href="/" class={active === 'inicio' ? 'active' : ''}>Inicio</a>
           <a href="/teoria" class={active === 'teoria' ? 'active' : ''}>Teoría</a>
           <a href="/exposiciones" class={active === 'exposiciones' ? 'active' : ''}>Exposiciones</a>
+          <a href="/examenes" class={active === 'examenes' ? 'active' : ''}>Exámenes</a>
           <a href="https://github.com/steveenmaque/RepasoCV" class="hide-sm" target="_blank" rel="noopener">GitHub</a>
         </nav>
       </div>

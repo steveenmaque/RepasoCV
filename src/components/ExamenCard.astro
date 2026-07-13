@@ -1,0 +1,23 @@
+---
+import type { Examen } from '../lib/types';
+interface Props { examen: Examen; }
+const { examen } = Astro.props;
+const nApp = examen.aplicacion.length;
+const nVF = examen.verdaderoFalso.length;
+const nMC = examen.opcionMultiple.length;
+---
+
+<a class="card examen-card" href={`/examen/${examen.slug}`} style={`--_c:${examen.color}`}>
+  <span class="code">{examen.codigo}{examen.duracion ? ` · ${examen.duracion}` : ''}</span>
+  <h3>{examen.titulo}</h3>
+  <p>{examen.descripcion}</p>
+  <div class="tags">
+    {examen.temas.slice(0, 4).map((t) => <span class="tag">{t}</span>)}
+  </div>
+  <div class="fuente">📖 {examen.fuente}</div>
+  <div class="meta">
+    <span><b>{nVF}</b> V/F</span>
+    {nMC > 0 && <span><b>{nMC}</b> opción múltiple</span>}
+    <span><b>{nApp}</b> aplicación</span>
+  </div>
+</a>

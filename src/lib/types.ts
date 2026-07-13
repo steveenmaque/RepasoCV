@@ -32,6 +32,28 @@ export interface Ejercicio {
   solucion: string;
 }
 
+/** Pregunta teórica de Verdadero / Falso con justificación razonada. */
+export interface PreguntaVF {
+  afirmacion: string;
+  esVerdadero: boolean;
+  justificacion: string; // por qué es verdadera o falsa
+}
+
+/** Examen tipo "pasado" de Computación Gráfica, basado en bibliografía clásica. */
+export interface Examen {
+  slug: string;
+  codigo: string; // p.ej. "Examen 01"
+  titulo: string;
+  descripcion: string;
+  fuente: string; // libro / referencia de donde se inspira
+  duracion?: string; // p.ej. "2 horas"
+  temas: string[]; // temario cubierto
+  color: string; // color de acento (hex)
+  verdaderoFalso: PreguntaVF[];
+  opcionMultiple: Pregunta[];
+  aplicacion: Ejercicio[];
+}
+
 export interface Tema {
   slug: string;
   seccion: 'teoria' | 'exposiciones';

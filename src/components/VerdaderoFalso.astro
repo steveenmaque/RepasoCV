@@ -1,0 +1,131 @@
+---
+import type { PreguntaVF } from '../lib/types';
+import { inline } from '../lib/render';
+
+interface Props { items: PreguntaVF[]; id: string; }
+const { items, id } = Astro.props;
+
+// Solo se filtra al cliente lo imprescindible (respuesta y justificación ya renderizada).
+const data = items.map((it) => ({ v: it.esVerdadero, just: inline(it.justificacion) }));
+---
+
+<div class="vf" id={id} data-vf={JSON.stringify(data)}>
+  <div class="vf-top">
+    <span class="vf-hint">Marca <b>V</b> (verdadero) o <b>F</b> (falso) en cada enunciado y pulsa <b>Corregir</b>.</span>
+    <span class="vf-score" hidden>Aciertos: <b class="sc">0</b>/{items.length}</span>
+  </div>
+
+  <ol class="vf-list">
+    {
+      items.map((it, i) => (
+        <li class="vf-item" data-i={i}>
+          <div class="vf-afir" set:html={inline(it.afirmacion)} />
+          <div class="vf-btns" role="group" aria-label="Verdadero o Falso">
+            <button class="vf-b v" data-val="true" type="button" aria-pressed="false">V</button>
+            <button class="vf-b f" data-val="false" type="button" aria-pressed="false">F</button>
+          </div>
+          <div class="vf-just" hidden>
+            <span class="vf-tag" />
+            <span class="vf-txt" set:html={inline(it.justificacion)} />
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="vf-actions">
+    <button class="btn btn-primary vf-check" type="button">Corregir</button>
+    <button class="btn btn-ghost vf-reset" type="button" hidden>↺ Reiniciar</button>
+    <div class="vf-result" hidden>
+      <span class="vf-pct">0%</span> · <span class="vf-msg"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initVF(root: HTMLElement) {
+    const data = JSON.parse(root.dataset.vf || '[]') as { v: boolean }[];
+    const items = Array.from(root.querySelectorAll<HTMLElement>('.vf-item'));
+    const chosen = new Array(items.length).fill(null) as (boolean | null)[];
+    const checkBtn = root.querySelector<HTMLButtonElement>('.vf-check')!;
+    const resetBtn = root.querySelector<HTMLButtonElement>('.vf-reset')!;
+    const scoreBox = root.querySelector<HTMLElement>('.vf-score')!;
+    const scEl = root.querySelector<HTMLElement>('.sc')!;
+    const resultBox = root.querySelector<HTMLElement>('.vf-result')!;
+    let corrected = false;
+
+    items.forEach((li, i) => {
+      const btns = li.querySelectorAll<HTMLButtonElement>('.vf-b');
+      btns.forEach((b) => {
+        b.addEventListener('click', () => {
+          if (corrected) return;
+          const val = b.dataset.val === 'true';
+          chosen[i] = val;
+          btns.forEach((x) => x.setAttribute('aria-pressed', 'false'));
+          btns.forEach((x) => x.classList.remove('sel'));
+          b.setAttribute('aria-pressed', 'true');
+          b.classList.add('sel');
+        });
+      });
+    });
+
+    function correct() {
+      corrected = true;
+      let ok = 0;
+      items.forEach((li, i) => {
+        const btns = li.querySelectorAll<HTMLButtonElement>('.vf-b');
+        btns.forEach((b) => (b.disabled = true));
+        const rightVal = data[i].v;
+        const rightBtn = li.querySelector<HTMLButtonElement>(`.vf-b[data-val="${rightVal}"]`)!;
+        rightBtn.classList.add('is-right');
+        const acierto = chosen[i] === rightVal;
+        if (acierto) ok++;
+        else if (chosen[i] !== null) {
+          li.querySelector<HTMLButtonElement>(`.vf-b[data-val="${chosen[i]}"]`)!.classList.add('is-wrong');
+        }
+        li.classList.add(acierto ? 'ok' : 'bad');
+        const just = li.querySelector<HTMLElement>('.vf-just')!;
+        const tag = li.querySelector<HTMLElement>('.vf-tag')!;
+        tag.textContent = rightVal ? 'Verdadero' : 'Falso';
+        tag.className = 'vf-tag ' + (rightVal ? 't-v' : 't-f');
+        just.hidden = false;
+      });
+      scEl.textContent = String(ok);
+      scoreBox.hidden = false;
+      const pct = Math.round((ok / items.length) * 100);
+      (resultBox.querySelector('.vf-pct') as HTMLElement).textContent = pct + '%';
+      let msg = '';
+      if (pct >= 85) msg = '¡Dominas la teoría! 🎯';
+      else if (pct >= 60) msg = 'Bien, repasa lo que fallaste. 💪';
+      else msg = 'Refuerza la teoría y reintenta. 📚';
+      (resultBox.querySelector('.vf-msg') as HTMLElement).textContent = msg;
+      resultBox.hidden = false;
+      checkBtn.hidden = true;
+      resetBtn.hidden = false;
+      root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function reset() {
+      corrected = false;
+      chosen.fill(null);
+      items.forEach((li) => {
+        li.classList.remove('ok', 'bad');
+        li.querySelector<HTMLElement>('.vf-just')!.hidden = true;
+        li.querySelectorAll<HTMLButtonElement>('.vf-b').forEach((b) => {
+          b.disabled = false;
+          b.classList.remove('sel', 'is-right', 'is-wrong');
+          b.setAttribute('aria-pressed', 'false');
+        });
+      });
+      scoreBox.hidden = true;
+      resultBox.hidden = true;
+      checkBtn.hidden = false;
+      resetBtn.hidden = true;
+    }
+
+    checkBtn.addEventListener('click', correct);
+    resetBtn.addEventListener('click', reset);
+  }
+
+  document.querySelectorAll<HTMLElement>('.vf[data-vf]').forEach(initVF);
+</script>
