@@ -1,0 +1,16 @@
+{
+  "name": "repaso-cv",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "RepasoCV — Guía de estudio interactiva de Computación Visual (UNMSM)",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.13.0",
+    "katex": "^0.16.11"
+  }
+}

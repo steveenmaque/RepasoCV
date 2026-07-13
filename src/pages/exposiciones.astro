@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import TemaCard from '../components/TemaCard.astro';
+import { exposiciones } from '../data';
+---
+
+<Base title="Exposiciones — RepasoCV" active="exposiciones">
+  <section class="section container" style="padding-top:56px;">
+    <div class="section-head">
+      <span class="pill expos">Exposiciones</span>
+      <h2>Temas de las exposiciones grupales</h2>
+    </div>
+    <p style="color:var(--text-dim);max-width:720px;margin:-6px 0 26px;">
+      Nueve temas expuestos por los equipos: desde fractales e iluminación hasta ray tracing,
+      motores gráficos y realidad virtual/aumentada. Cada tema incluye bases teóricas, fórmulas,
+      ejercicios y un cuestionario de 10–15 preguntas.
+    </p>
+    <div class="grid">
+      {exposiciones.map((t) => <TemaCard tema={t} />)}
+    </div>
+  </section>
+</Base>

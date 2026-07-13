@@ -1,0 +1,61 @@
+---
+import type { Bloque } from '../lib/types';
+import { inline, display } from '../lib/render';
+
+interface Props { bloques: Bloque[]; }
+const { bloques } = Astro.props;
+
+const etiquetaNota: Record<string, string> = { info: 'Nota', clave: 'Clave', aviso: 'Ojo' };
+---
+
+{
+  bloques.map((b) => {
+    if (b.tipo === 'subtitulo') return <h3 set:html={inline(b.texto)} />;
+    if (b.tipo === 'parrafo') return <p set:html={inline(b.texto)} />;
+    if (b.tipo === 'lista') {
+      const items = b.items.map((it) => <li set:html={inline(it)} />);
+      return b.ordenada ? <ol>{items}</ol> : <ul>{items}</ul>;
+    }
+    if (b.tipo === 'formula')
+      return (
+        <div class="formula-block">
+          <div set:html={display(b.latex)} />
+          {b.nota && <div class="nota" set:html={inline(b.nota)} />}
+        </div>
+      );
+    if (b.tipo === 'imagen')
+      return (
+        <figure class="img">
+          <img src={b.src} alt={b.alt} loading="lazy" decoding="async" />
+          {b.caption && <figcaption set:html={inline(b.caption)} />}
+        </figure>
+      );
+    if (b.tipo === 'nota')
+      return (
+        <div class={`callout ${b.estilo ?? 'info'}`}>
+          <span class="lbl">{etiquetaNota[b.estilo ?? 'info']}:</span>
+          <span set:html={inline(b.texto)} />
+        </div>
+      );
+    if (b.tipo === 'codigo')
+      return (
+        <pre class="code"><code>{b.code}</code></pre>
+      );
+    if (b.tipo === 'tabla')
+      return (
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>{b.headers.map((h) => <th set:html={inline(h)} />)}</tr>
+            </thead>
+            <tbody>
+              {b.filas.map((fila) => (
+                <tr>{fila.map((c) => <td set:html={inline(c)} />)}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    return null;
+  })
+}

@@ -1,0 +1,19 @@
+---
+import type { Tema } from '../lib/types';
+interface Props { tema: Tema; }
+const { tema } = Astro.props;
+---
+
+<a class="card" href={`/tema/${tema.slug}`} style={`--_c:${tema.color}`}>
+  <span class="code">{tema.codigo ?? (tema.seccion === 'teoria' ? 'TEORÍA' : 'EXPOSICIÓN')}</span>
+  <h3>{tema.titulo}</h3>
+  <p>{tema.resumen}</p>
+  <div class="tags">
+    {tema.tags.slice(0, 4).map((t) => <span class="tag">{t}</span>)}
+  </div>
+  <div class="meta">
+    <span><b>{tema.preguntas.length}</b> preguntas</span>
+    <span><b>{tema.ejercicios.length}</b> ejercicios</span>
+    <span><b>{tema.formulas.length}</b> fórmulas</span>
+  </div>
+</a>

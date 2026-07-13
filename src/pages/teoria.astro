@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import TemaCard from '../components/TemaCard.astro';
+import { teoria } from '../data';
+---
+
+<Base title="Teoría — RepasoCV" active="teoria">
+  <section class="section container" style="padding-top:56px;">
+    <div class="section-head">
+      <span class="pill teoria">Teoría</span>
+      <h2>Sesiones de teoría del curso</h2>
+    </div>
+    <p style="color:var(--text-dim);max-width:720px;margin:-6px 0 26px;">
+      Contenido de las clases teóricas: representación de curvas y superficies, modelado de sólidos
+      y representación de fronteras. Cada tema incluye teoría con fórmulas, ejercicios y un
+      cuestionario de hasta 20 preguntas.
+    </p>
+    <div class="grid">
+      {teoria.map((t) => <TemaCard tema={t} />)}
+    </div>
+  </section>
+</Base>

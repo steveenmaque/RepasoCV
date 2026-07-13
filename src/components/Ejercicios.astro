@@ -1,0 +1,36 @@
+---
+import type { Ejercicio } from '../lib/types';
+import { inline } from '../lib/render';
+
+interface Props { ejercicios: Ejercicio[]; }
+const { ejercicios } = Astro.props;
+
+const nTeoria = ejercicios.filter((e) => e.tipo === 'teoria').length;
+const nPractica = ejercicios.filter((e) => e.tipo === 'practica').length;
+---
+
+<p class="ex-intro" style="color:var(--text-mute);font-size:0.9rem;">
+  {ejercicios.length} ejercicios · {nTeoria} de teoría · {nPractica} prácticos · nivel medio–difícil.
+  Intenta resolverlos antes de abrir la solución.
+</p>
+
+{
+  ejercicios.map((e, i) => (
+    <div class="ex">
+      <div class="ex-head">
+        <span class="n">#{String(i + 1).padStart(2, '0')}</span>
+        <h4>{e.titulo}</h4>
+        <span class={`badge ${e.tipo}`}>{e.tipo}</span>
+        <span class={`badge ${e.dif}`}>{e.dif}</span>
+      </div>
+      <div class="ex-body">
+        <div class="enun" set:html={inline(e.enunciado)} />
+        {e.pista && <div class="pista" set:html={'💡 ' + inline(e.pista)} />}
+        <details>
+          <summary>Ver solución</summary>
+          <div class="sol" set:html={inline(e.solucion)} />
+        </details>
+      </div>
+    </div>
+  ))
+}

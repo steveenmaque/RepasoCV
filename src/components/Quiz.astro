@@ -1,0 +1,152 @@
+---
+import type { Pregunta } from '../lib/types';
+import { inline } from '../lib/render';
+
+interface Props { preguntas: Pregunta[]; id: string; }
+const { preguntas, id } = Astro.props;
+
+// Barajamos las preguntas de forma determinista en build para variedad, pero
+// mantenemos las opciones en su orden original (la explicación referencia letras).
+const letras = ['A', 'B', 'C', 'D', 'E'];
+const data = preguntas.map((p) => ({
+  correcta: p.correcta,
+  exp: inline(p.exp),
+}));
+---
+
+<div class="quiz" id={id} data-quiz={JSON.stringify(data)}>
+  <div class="quiz-top">
+    <span class="prog-txt">Pregunta <b class="cur">1</b> de {preguntas.length}</span>
+    <span class="score">Aciertos: <b class="sc">0</b>/{preguntas.length}</span>
+  </div>
+  <div class="progbar"><span class="fill"></span></div>
+
+  {
+    preguntas.map((p, i) => (
+      <div class="q-card" data-q={i} style={i === 0 ? '' : 'display:none'}>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="q-num">PREGUNTA {String(i + 1).padStart(2, '0')}</span>
+          {p.dif && <span class={`badge ${p.dif} q-diff`}>{p.dif}</span>}
+        </div>
+        <div class="q-text" set:html={inline(p.q)} />
+        <div class="options">
+          {p.opciones.map((op, j) => (
+            <button class="opt" data-i={j} type="button">
+              <span class="key">{letras[j]}</span>
+              <span set:html={inline(op)} />
+            </button>
+          ))}
+        </div>
+        <div class="explain">
+          <span class="lbl">Explicación:</span>
+          <span class="exp-txt" set:html={inline(p.exp)} />
+        </div>
+        <div class="quiz-nav">
+          <button class="btn btn-ghost prev" type="button" disabled={i === 0}>← Anterior</button>
+          <button class="btn btn-primary next" type="button">
+            {i === preguntas.length - 1 ? 'Ver resultado' : 'Siguiente →'}
+          </button>
+        </div>
+      </div>
+    ))
+  }
+
+  <div class="quiz-result">
+    <div class="big"><span class="final-sc">0</span>/{preguntas.length}</div>
+    <div class="msg final-msg"></div>
+    <button class="btn btn-ghost retry" type="button">↺ Reintentar cuestionario</button>
+  </div>
+</div>
+
+<script>
+  function initQuiz(root: HTMLElement) {
+    const data = JSON.parse(root.dataset.quiz || '[]') as { correcta: number }[];
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('.q-card'));
+    const total = cards.length;
+    const answered = new Array(total).fill(-1); // opción elegida por pregunta
+    const fill = root.querySelector<HTMLElement>('.fill')!;
+    const curEl = root.querySelector<HTMLElement>('.cur')!;
+    const scEl = root.querySelector<HTMLElement>('.sc')!;
+    const result = root.querySelector<HTMLElement>('.quiz-result')!;
+    let idx = 0;
+
+    function score() {
+      return answered.reduce((a, sel, i) => a + (sel === data[i].correcta ? 1 : 0), 0);
+    }
+    function updateTop() {
+      curEl.textContent = String(Math.min(idx + 1, total));
+      scEl.textContent = String(score());
+      fill.style.width = ((idx) / total) * 100 + '%';
+    }
+    function show(i: number) {
+      cards.forEach((c, k) => (c.style.display = k === i ? '' : 'none'));
+      result.classList.remove('show');
+      idx = i;
+      updateTop();
+    }
+    function lock(card: HTMLElement, sel: number, correct: number) {
+      const opts = card.querySelectorAll<HTMLButtonElement>('.opt');
+      opts.forEach((o, j) => {
+        o.disabled = true;
+        if (j === correct) o.classList.add('correct');
+        if (j === sel && sel !== correct) o.classList.add('wrong');
+      });
+      const exp = card.querySelector<HTMLElement>('.explain')!;
+      exp.classList.add('show');
+      if (sel !== correct) exp.classList.add('miss');
+    }
+
+    cards.forEach((card, i) => {
+      const opts = card.querySelectorAll<HTMLButtonElement>('.opt');
+      opts.forEach((o) => {
+        o.addEventListener('click', () => {
+          if (answered[i] !== -1) return;
+          const sel = Number(o.dataset.i);
+          answered[i] = sel;
+          lock(card, sel, data[i].correcta);
+          updateTop();
+        });
+      });
+      card.querySelector('.next')!.addEventListener('click', () => {
+        if (i < total - 1) show(i + 1);
+        else finish();
+      });
+      card.querySelector('.prev')!.addEventListener('click', () => {
+        if (i > 0) show(i - 1);
+      });
+    });
+
+    function finish() {
+      cards.forEach((c) => (c.style.display = 'none'));
+      const sc = score();
+      fill.style.width = '100%';
+      (result.querySelector('.final-sc') as HTMLElement).textContent = String(sc);
+      const pct = Math.round((sc / total) * 100);
+      let msg = '';
+      if (pct >= 85) msg = '¡Excelente! Dominas este tema. 🎯';
+      else if (pct >= 60) msg = 'Buen nivel. Repasa lo que fallaste. 💪';
+      else msg = 'Toca reforzar. Vuelve a la teoría y reintenta. 📚';
+      (result.querySelector('.final-msg') as HTMLElement).textContent = `${pct}% correcto. ${msg}`;
+      result.classList.add('show');
+      curEl.textContent = String(total);
+      scEl.textContent = String(sc);
+    }
+
+    root.querySelector('.retry')!.addEventListener('click', () => {
+      answered.fill(-1);
+      cards.forEach((card) => {
+        card.querySelectorAll<HTMLButtonElement>('.opt').forEach((o) => {
+          o.disabled = false;
+          o.classList.remove('correct', 'wrong');
+        });
+        const exp = card.querySelector<HTMLElement>('.explain')!;
+        exp.classList.remove('show', 'miss');
+      });
+      show(0);
+    });
+
+    updateTop();
+  }
+
+  document.querySelectorAll<HTMLElement>('.quiz[data-quiz]').forEach(initQuiz);
+</script>

@@ -1,0 +1,71 @@
+---
+import Base from '../../layouts/Base.astro';
+import Bloques from '../../components/Bloques.astro';
+import Ejercicios from '../../components/Ejercicios.astro';
+import Quiz from '../../components/Quiz.astro';
+import { display, inline } from '../../lib/render';
+import { todos, porSlug } from '../../data';
+
+export function getStaticPaths() {
+  return todos.map((t) => ({ params: { slug: t.slug } }));
+}
+
+const { slug } = Astro.params;
+const tema = porSlug[slug!];
+const secLabel = tema.seccion === 'teoria' ? 'Teoría' : 'Exposiciones';
+const secHref = tema.seccion === 'teoria' ? '/teoria' : '/exposiciones';
+---
+
+<Base title={`${tema.titulo} — RepasoCV`} description={tema.resumen} active={tema.seccion}>
+  <section class="topic-hero" style={`--_c:${tema.color}`}>
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="/">Inicio</a> ·
+        <a href={secHref}>{secLabel}</a> ·
+        <span>{tema.titulo}</span>
+      </div>
+      <span class={`pill ${tema.seccion === 'teoria' ? 'teoria' : 'expos'}`}>
+        {tema.codigo ?? secLabel}
+      </span>
+      <h1>{tema.titulo}</h1>
+      <p class="sub">{tema.subtitulo}</p>
+    </div>
+  </section>
+
+  <div class="container layout">
+    <aside class="toc">
+      <div class="toc-title">En esta página</div>
+      <a href="#teoria">Teoría</a>
+      {tema.formulas.length > 0 && <a href="#formulas">Fórmulas clave</a>}
+      <a href="#ejercicios">Ejercicios</a>
+      <a href="#quiz">Cuestionario</a>
+    </aside>
+
+    <div class="content">
+      <h2 class="block-title" id="teoria"><span class="ico">📘</span> Teoría</h2>
+      <Bloques bloques={tema.teoria} />
+
+      {
+        tema.formulas.length > 0 && (
+          <>
+            <h2 class="block-title" id="formulas"><span class="ico">🧮</span> Fórmulas clave</h2>
+            <div class="cheat">
+              {tema.formulas.map((f) => (
+                <div class="row">
+                  <div class="f" set:html={display(f.latex)} />
+                  <div class="d" set:html={inline(f.desc)} />
+                </div>
+              ))}
+            </div>
+          </>
+        )
+      }
+
+      <h2 class="block-title" id="ejercicios"><span class="ico">✏️</span> Ejercicios</h2>
+      <Ejercicios ejercicios={tema.ejercicios} />
+
+      <h2 class="block-title" id="quiz"><span class="ico">🧠</span> Cuestionario ({tema.preguntas.length} preguntas)</h2>
+      <Quiz preguntas={tema.preguntas} id={`quiz-${tema.slug}`} />
+    </div>
+  </div>
+</Base>
