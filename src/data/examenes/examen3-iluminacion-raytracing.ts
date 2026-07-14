@@ -12,101 +12,105 @@ const examen: Examen = {
   temas: ['Phong', 'Gouraud vs Phong', 'Ray tracing', 'Refracción (Snell)', 'Texturas / mipmap', 'Radiosidad', 'Fractales'],
   color: '#f59e0b',
 
+  // Enunciados difíciles: cada FALSO lo es por un único detalle (palabra, signo o fórmula).
+  // Clave balanceada (8 V / 7 F) y en orden no predecible.
+  // Fórmulas de Phong según el PPT de Iluminación Local: componentes con max(·,0).
   verdaderoFalso: [
     {
-      afirmacion: 'En el modelo de Phong, la componente especular depende del ángulo entre el vector de reflexión $R$ y el vector al observador $V$.',
+      afirmacion: 'En el modelo de Phong la componente especular es $k_s\\,\\max(R\\cdot V,\\,0)^{n}$: depende del ángulo entre el vector de reflexión $R$ y el de visión $V$, y el exponente $n$ controla el tamaño del brillo.',
       esVerdadero: true,
-      justificacion: 'La especular es $k_s\\,(R\\cdot V)^{n}$: máxima cuando $V$ coincide con $R$. El exponente $n$ controla el tamaño del brillo.',
+      justificacion: 'Correcto y tal como se ve en clase: máxima cuando $V$ coincide con $R$; $n$ grande ⇒ brillo pequeño y concentrado.',
     },
     {
       afirmacion: 'El sombreado de Gouraud interpola el vector normal en cada píxel del polígono.',
       esVerdadero: false,
-      justificacion: 'Gouraud interpola **colores** ya calculados en los vértices. Quien interpola **normales** por píxel es el sombreado de **Phong**, que reproduce mejor los brillos.',
+      justificacion: 'Detalle falso: Gouraud interpola **colores** ya calculados en los vértices. Quien interpola **normales por píxel** es el sombreado de **Phong**.',
     },
     {
-      afirmacion: 'El sombreado de Phong (por píxel) reproduce brillos especulares pequeños mejor que el de Gouraud.',
+      afirmacion: 'La componente difusa de Lambert es proporcional a $\\max(N\\cdot L,\\,0)$, con $N$ y $L$ unitarios.',
       esVerdadero: true,
-      justificacion: 'Gouraud puede "perderse" un brillo que cae dentro de un polígono al interpolar solo colores de vértice; Phong evalúa la iluminación por píxel y lo captura.',
+      justificacion: 'Correcto: ley del coseno de Lambert; se acota a 0 para no iluminar caras de espaldas a la luz.',
     },
     {
-      afirmacion: 'La componente difusa de Lambert es proporcional a $\\cos\\theta = N\\cdot L$ (con $N$ y $L$ unitarios).',
+      afirmacion: 'El ray tracing de Whitted (1980) modela reflexión y refracción especulares lanzando rayos secundarios de forma recursiva, además de rayos de sombra.',
       esVerdadero: true,
-      justificacion: 'Ley del coseno de Lambert: la superficie recibe menos flujo por área cuanto más rasante llega la luz. Se satura a 0 (no negativa).',
-    },
-    {
-      afirmacion: 'El ray tracing de Whitted modela reflexión y refracción especulares lanzando rayos secundarios de forma recursiva.',
-      esVerdadero: true,
-      justificacion: 'En cada impacto genera rayos de reflexión, de refracción y de sombra; la recursión termina al alcanzar una profundidad máxima o un peso despreciable.',
+      justificacion: 'Correcto (Turner Whitted, 1980): en cada impacto genera rayos de reflexión, refracción y sombra; la recursión termina por profundidad máxima.',
     },
     {
       afirmacion: 'La radiosidad es un método de iluminación global dependiente del punto de vista.',
       esVerdadero: false,
-      justificacion: 'La radiosidad calcula el intercambio difuso de energía entre parches y es **independiente del punto de vista**: se resuelve una vez y luego se navega la escena.',
+      justificacion: 'Detalle falso: la radiosidad (intercambio difuso entre parches) es **independiente del punto de vista**: se resuelve una vez y luego se navega la escena.',
     },
     {
       afirmacion: 'La ley de Snell se expresa como $n_1\\sin\\theta_1 = n_2\\sin\\theta_2$.',
       esVerdadero: true,
-      justificacion: 'Relaciona los senos de los ángulos con los índices de refracción. Si $n_1>n_2$ y $\\theta_1$ supera el ángulo crítico, hay reflexión total interna.',
-    },
-    {
-      afirmacion: 'El z-buffer resuelve la visibilidad comparando la profundidad de los fragmentos por píxel.',
-      esVerdadero: true,
-      justificacion: 'Guarda la $z$ más cercana por píxel; un fragmento se pinta solo si su profundidad es menor que la almacenada. Es un algoritmo de espacio imagen.',
+      justificacion: 'Correcto: relaciona los **senos** de los ángulos con los índices de refracción. Si $n_1>n_2$ y se supera el ángulo crítico hay reflexión total interna.',
     },
     {
       afirmacion: 'El mapeo de texturas (texture mapping) modifica la geometría real de la malla del objeto.',
       esVerdadero: false,
-      justificacion: 'El texture mapping cambia el **color/apariencia** de la superficie, no la geometría. Quien sí desplaza los vértices es el **displacement mapping**.',
-    },
-    {
-      afirmacion: 'El bump mapping perturba las normales para simular relieve sin alterar la geometría del objeto.',
-      esVerdadero: true,
-      justificacion: 'Modifica $N$ por píxel para que la iluminación insinúe rugosidad; la silueta del objeto sigue siendo lisa (a diferencia del displacement).',
-    },
-    {
-      afirmacion: 'El mipmapping usa versiones prefiltradas de la textura a distintas resoluciones para reducir el aliasing.',
-      esVerdadero: true,
-      justificacion: 'Se elige el nivel cuya resolución se ajusta al tamaño en pantalla, evitando el centelleo de texturas minificadas.',
+      justificacion: 'Detalle falso: cambia el **color/apariencia** de la superficie, no la geometría. Quien desplaza los vértices es el **displacement mapping**.',
     },
     {
       afirmacion: 'Aumentar el exponente especular $n$ de Phong produce brillos más grandes y difusos.',
       esVerdadero: false,
-      justificacion: 'Es al revés: un $n$ grande concentra el brillo en un punto **pequeño y agudo** (superficie muy pulida). Un $n$ pequeño da un brillo amplio.',
+      justificacion: 'Detalle falso: un $n$ grande concentra el brillo en un punto **pequeño y agudo** (superficie muy pulida). El brillo amplio corresponde a $n$ pequeño.',
     },
     {
-      afirmacion: 'La intersección rayo–esfera se reduce a resolver una ecuación cuadrática en el parámetro $t$.',
+      afirmacion: 'El z-buffer resuelve la visibilidad comparando la profundidad de los fragmentos por píxel.',
       esVerdadero: true,
-      justificacion: 'Sustituir $P(t)=O+tD$ en $\\lVert P-C\\rVert^2=r^2$ da $at^2+bt+c=0$; el discriminante indica 0, 1 o 2 impactos.',
+      justificacion: 'Correcto: guarda la $z$ más cercana por píxel; solo pinta un fragmento si su profundidad es menor. Es un algoritmo de espacio imagen.',
+    },
+    {
+      afirmacion: 'El bump mapping perturba las normales para simular relieve sin alterar la geometría del objeto.',
+      esVerdadero: true,
+      justificacion: 'Correcto: modifica $N$ por píxel para que la iluminación insinúe rugosidad; la silueta sigue lisa (a diferencia del displacement).',
+    },
+    {
+      afirmacion: 'El vector de reflexión especular se calcula como $R = 2(N\\cdot L)\\,L - N$.',
+      esVerdadero: false,
+      justificacion: 'Detalle falso: la fórmula correcta es $R = 2(N\\cdot L)\\,N - L$; en el enunciado están **intercambiados** $N$ y $L$.',
+    },
+    {
+      afirmacion: 'El mipmapping usa versiones prefiltradas de la textura a distintas resoluciones para reducir el aliasing al minificar.',
+      esVerdadero: true,
+      justificacion: 'Correcto: se elige el nivel cuya resolución se ajusta al tamaño en pantalla, evitando el centelleo de texturas lejanas.',
+    },
+    {
+      afirmacion: 'En ray tracing, hallar la intersección de un rayo con una esfera se reduce a resolver una ecuación cuadrática en el parámetro $t$.',
+      esVerdadero: true,
+      justificacion: 'Correcto: sustituir $P(t)=O+tD$ en $\\lVert P-C\\rVert^2=r^2$ da $at^2+bt+c=0$; el discriminante indica 0, 1 o 2 impactos.',
+    },
+    {
+      afirmacion: 'La componente ambiente del modelo de Phong depende del ángulo $N\\cdot L$ entre la normal y la luz.',
+      esVerdadero: false,
+      justificacion: 'Detalle falso: la ambiente es una **constante** $k_a I_a$, independiente de la geometría; evita que las zonas sin luz directa queden totalmente negras. La que depende de $N\\cdot L$ es la difusa.',
     },
     {
       afirmacion: 'El modelo de color RGB es sustractivo y se emplea en impresión sobre papel.',
       esVerdadero: false,
-      justificacion: 'RGB es **aditivo** (mezcla de luz, para pantallas). El modelo **sustractivo** de impresión es CMY(K).',
-    },
-    {
-      afirmacion: 'En la reflexión especular perfecta, el ángulo de incidencia es igual al de reflexión medidos respecto a la normal.',
-      esVerdadero: true,
-      justificacion: 'Ley de reflexión: $\\theta_i=\\theta_r$ en el plano de incidencia. Es la base para el vector $R=2(N\\cdot L)N-L$.',
+      justificacion: 'Detalle falso: RGB es **aditivo** (mezcla de luz, para pantallas). El modelo **sustractivo** de impresión es CMY(K).',
     },
   ],
 
+  // Clave repartida (A, C, B): ya no está siempre en la misma posición.
   opcionMultiple: [
     {
       q: 'El término ambiente $k_a I_a$ del modelo de Phong sirve para:',
-      opciones: ['Simular el brillo especular', 'Aproximar la luz indirecta que evita zonas totalmente negras', 'Calcular sombras arrojadas', 'Interpolar normales'],
-      correcta: 1,
+      opciones: ['Aproximar la luz indirecta que evita zonas totalmente negras', 'Simular el brillo especular', 'Calcular sombras arrojadas', 'Interpolar normales por píxel'],
+      correcta: 0,
       exp: 'La ambiente es una constante que emula la luz rebotada de la escena; sin ella, las caras no iluminadas quedarían completamente negras.',
       dif: 'media',
     },
     {
-      q: '¿Qué método es de iluminación GLOBAL y depende del punto de vista?',
-      opciones: ['Radiosidad', 'Ray tracing (Whitted)', 'Sombreado de Gouraud', 'Modelo de Phong local'],
-      correcta: 1,
+      q: '¿Qué método es de iluminación GLOBAL y además depende del punto de vista?',
+      opciones: ['Radiosidad', 'Sombreado de Gouraud', 'Ray tracing (Whitted)', 'Modelo de Phong local'],
+      correcta: 2,
       exp: 'El ray tracing depende de la cámara (los rayos parten del ojo) y es global (reflejos, refracción, sombras). La radiosidad es global pero independiente del punto de vista.',
       dif: 'dificil',
     },
     {
-      q: 'Para reducir el aliasing al minificar una textura lejana se usa:',
+      q: 'Para reducir el aliasing al minificar (alejar) una textura se usa:',
       opciones: ['Bump mapping', 'Mipmapping', 'CSG', 'El z-buffer'],
       correcta: 1,
       exp: 'El mipmapping selecciona una versión prefiltrada de menor resolución acorde al tamaño en pantalla, evitando el centelleo.',
@@ -120,8 +124,8 @@ const examen: Examen = {
       tipo: 'practica',
       dif: 'media',
       enunciado: 'Calcula la intensidad $I$ en un punto con $k_a=0.2$, $k_d=0.6$, $k_s=0.4$, exponente $n=8$, luz e intensidad ambiente $I_p=I_a=1$, sabiendo que $N\\cdot L=0.5$ y $R\\cdot V=0.8$.',
-      pista: 'Usa $I=k_aI_a+I_p\\big(k_d\\,(N\\cdot L)+k_s\\,(R\\cdot V)^{n}\\big)$.',
-      solucion: 'Ambiente: $k_aI_a=0.2$.\nDifusa: $k_d(N\\cdot L)=0.6\\times0.5=0.30$.\nEspecular: $(R\\cdot V)^{8}=0.8^{8}\\approx0.1678$, luego $k_s(R\\cdot V)^8=0.4\\times0.1678\\approx0.0671$.\n$I=0.2+1\\times(0.30+0.0671)=0.2+0.3671\\approx\\mathbf{0.567}$.',
+      pista: 'Usa $I=k_aI_a+I_p\\big(k_d\\,\\max(N\\cdot L,0)+k_s\\,\\max(R\\cdot V,0)^{n}\\big)$.',
+      solucion: 'Ambiente: $k_aI_a=0.2$.\nDifusa: $k_d\\max(N\\cdot L,0)=0.6\\times0.5=0.30$.\nEspecular: $\\max(R\\cdot V,0)^{8}=0.8^{8}\\approx0.1678$, luego $k_s(0.8)^8=0.4\\times0.1678\\approx0.0671$.\n$I=0.2+1\\times(0.30+0.0671)=0.2+0.3671\\approx\\mathbf{0.567}$.',
     },
     {
       titulo: 'Vector de reflexión',
@@ -164,10 +168,10 @@ const examen: Examen = {
       solucion: '$i=\\lfloor 0.25\\times256\\rfloor=\\lfloor 64\\rfloor=64$.\n$j=\\lfloor 0.75\\times256\\rfloor=\\lfloor 192\\rfloor=192$.\nTéxel $\\mathbf{(64,\\,192)}$. Si $u$ o $v$ salen de $[0,1]$, el modo de envoltura (*repeat*, *clamp*…) decide qué téxel leer.',
     },
     {
-      titulo: 'Dimensión fractal por conteo de cajas',
+      titulo: 'Dimensión fractal por autosimilitud',
       tipo: 'practica',
       dif: 'dificil',
-      enunciado: 'Calcula la dimensión fractal $D$ de (a) el triángulo de Sierpinski y (b) la alfombra (carpet) de Sierpinski, usando $D=\\dfrac{\\log N}{\\log(1/s)}$.',
+      enunciado: 'Calcula la dimensión fractal $D$ de (a) el triángulo de Sierpinski y (b) la alfombra (carpet) de Sierpinski, usando $D=\\dfrac{\\log N}{\\log(1/s)}$ ($N$ copias a escala $s$).',
       pista: 'Sierpinski triángulo: $N=3$ copias a escala $s=1/2$. Alfombra: $N=8$ copias a escala $s=1/3$.',
       solucion: '(a) Triángulo: $D=\\dfrac{\\log 3}{\\log 2}\\approx\\mathbf{1.585}$.\n(b) Alfombra: $D=\\dfrac{\\log 8}{\\log 3}\\approx\\mathbf{1.893}$.\nAmbas dimensiones son fraccionarias (entre 1 y 2): el fractal "llena" el plano más que una curva pero menos que una región sólida.',
     },

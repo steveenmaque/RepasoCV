@@ -12,84 +12,87 @@ const examen: Examen = {
   temas: ['Bézier', 'De Casteljau', 'Hermite', 'B-splines / NURBS', 'Continuidad', 'Superficies'],
   color: '#38bdf8',
 
+  // Enunciados difíciles: cada FALSO lo es por un único detalle (palabra, signo o coeficiente).
+  // Clave balanceada (8 V / 7 F) y en orden no predecible (sin alternancia ni rachas largas).
   verdaderoFalso: [
     {
-      afirmacion: 'Una curva de Bézier de grado $n$ interpola (pasa exactamente por) todos sus $n+1$ puntos de control.',
+      afirmacion: 'Una curva de Bézier de grado $n$ interpola únicamente sus dos puntos de control extremos, $P_0$ y $P_n$.',
+      esVerdadero: true,
+      justificacion: 'Correcto: pasa exactamente por $P_0$ y $P_n$, y solo "atrae" a los intermedios. La palabra clave es **únicamente** los extremos.',
+    },
+    {
+      afirmacion: 'El algoritmo de De Casteljau evalúa la curva mediante interpolaciones lineales sucesivas y, además, permite subdividirla en dos curvas de Bézier.',
+      esVerdadero: true,
+      justificacion: 'Correcto: los puntos intermedios de la construcción son justo los polígonos de control de las dos mitades.',
+    },
+    {
+      afirmacion: 'Los polinomios de Bernstein de grado $n$ son no negativos en $[0,1]$ y su suma vale $n$ para todo $t$.',
       esVerdadero: false,
-      justificacion: 'Solo pasa por los extremos $P_0$ y $P_n$; los puntos intermedios únicamente "atraen" la curva. Por eso se dice que la **aproxima**, no la interpola.',
+      justificacion: 'Detalle falso: la suma vale **1**, no $n$ (partición de la unidad, $\\sum_i B_i^n(t)=1$). Lo demás (no negatividad) sí es cierto.',
     },
     {
-      afirmacion: 'Los polinomios de Bernstein de grado $n$ cumplen $\\sum_{i=0}^{n} B_i^n(t)=1$ para todo $t\\in[0,1]$ (partición de la unidad).',
+      afirmacion: 'La continuidad paramétrica $C^1$ implica la geométrica $G^1$, pero no al revés.',
       esVerdadero: true,
-      justificacion: 'Sale del binomio de Newton: $\\big((1-t)+t\\big)^n=1$. Por eso la curva es una **combinación convexa** de los puntos de control.',
+      justificacion: 'Correcto. $C^1$ (igual dirección **y** magnitud de la tangente) es más fuerte que $G^1$ (solo igual dirección).',
     },
     {
-      afirmacion: 'El algoritmo de De Casteljau evalúa una curva de Bézier mediante interpolaciones lineales sucesivas y es numéricamente estable.',
-      esVerdadero: true,
-      justificacion: 'Repite $\\text{lerp}$ del polígono de control hasta llegar a un punto; además subdivide la curva. Es más estable que evaluar el polinomio directamente.',
-    },
-    {
-      afirmacion: 'La continuidad geométrica $G^1$ implica siempre continuidad paramétrica $C^1$.',
+      afirmacion: 'En un B-spline, mover un solo punto de control modifica la curva en toda su extensión (control global).',
       esVerdadero: false,
-      justificacion: 'Es al revés: $C^1 \\Rightarrow G^1$, pero no lo contrario. $G^1$ solo exige **igual dirección** de la tangente; $C^1$ exige además **igual magnitud** del vector derivada.',
+      justificacion: 'Detalle falso: los B-splines tienen control **local** (solo cambia un tramo, por el soporte local de $N_{i,p}$). El control global es de Bézier.',
     },
     {
-      afirmacion: 'Una curva de Hermite cúbica queda definida por dos puntos extremos y sus dos vectores tangente.',
-      esVerdadero: true,
-      justificacion: 'Usa $P_0, P_1, T_0, T_1$. Da control directo de las tangentes en los extremos, a diferencia de Bézier que usa puntos de control.',
-    },
-    {
-      afirmacion: 'Los B-splines ofrecen control local: mover un punto de control modifica solo una porción de la curva.',
-      esVerdadero: true,
-      justificacion: 'Sus funciones base $N_{i,p}$ tienen **soporte local** (no nulo en pocos intervalos de nudos). En Bézier, en cambio, cada base es no nula en todo $[0,1]$ ⇒ influencia global.',
-    },
-    {
-      afirmacion: 'Las curvas de Bézier son invariantes ante transformaciones afines: basta transformar sus puntos de control para transformar la curva.',
-      esVerdadero: true,
-      justificacion: 'Gracias a la partición de la unidad, aplicar una afín (traslación, rotación, escala) a los $P_i$ equivale a aplicarla a toda la curva.',
+      afirmacion: 'Para una Bézier de grado $n$, las tangentes en los extremos son $P\'(0)=n(P_1-P_0)$ y $P\'(1)=n(P_{n-1}-P_n)$.',
+      esVerdadero: false,
+      justificacion: 'Detalle falso: la tangente final es $P\'(1)=n(P_n-P_{n-1})$; en el enunciado el orden de la resta está **invertido** (cambia el signo del vector).',
     },
     {
       afirmacion: 'Toda curva de Bézier queda contenida en la envolvente convexa (casco convexo) de sus puntos de control.',
       esVerdadero: true,
-      justificacion: 'Al ser combinación convexa de los $P_i$ (pesos $\\ge 0$ que suman 1), no puede salirse de su casco convexo. Útil para *culling* y recorte.',
+      justificacion: 'Correcto: al ser combinación convexa (pesos $\\ge0$ que suman 1) no puede salir del casco convexo.',
     },
     {
-      afirmacion: 'Las NURBS pueden representar de forma exacta una circunferencia, cosa que una Bézier polinómica no logra.',
-      esVerdadero: true,
-      justificacion: 'Las NURBS son **racionales** (usan pesos $w_i$) y describen cónicas exactas. Una Bézier polinómica solo puede aproximar el círculo.',
-    },
-    {
-      afirmacion: 'Para una Bézier de grado $n$, la tangente en el punto inicial es paralela al segmento $P_0P_1$.',
-      esVerdadero: true,
-      justificacion: '$P\'(0)=n(P_1-P_0)$, es decir apunta de $P_0$ hacia $P_1$. Análogamente $P\'(1)=n(P_n-P_{n-1})$.',
-    },
-    {
-      afirmacion: 'Elevar el grado de una curva de Bézier (degree elevation) cambia la forma de la curva.',
+      afirmacion: 'Elevar el grado de una curva de Bézier (degree elevation) añade un punto de control y modifica ligeramente la forma de la curva.',
       esVerdadero: false,
-      justificacion: 'La elevación de grado agrega un punto de control **sin alterar la curva**; sirve para compatibilizar curvas de grados distintos antes de operarlas.',
+      justificacion: 'Detalle falso: la curva queda **idéntica**; solo cambia su representación (un punto más). No hay cambio de forma "ligero" ni de ningún tipo.',
     },
     {
-      afirmacion: 'Una superficie de Bézier se genera como producto tensorial de dos familias de funciones base sobre una malla de control.',
+      afirmacion: 'Las NURBS, al ser racionales (usan pesos $w_i$), pueden representar de forma exacta circunferencias y elipses.',
       esVerdadero: true,
-      justificacion: '$S(u,v)=\\sum_i\\sum_j B_i^m(u)\\,B_j^n(v)\\,P_{ij}$: se combinan bases en $u$ y en $v$ sobre la malla $P_{ij}$.',
+      justificacion: 'Correcto: los pesos permiten cónicas exactas, algo imposible para una Bézier polinómica.',
     },
     {
-      afirmacion: 'La representación paramétrica $P(t)=(x(t),y(t))$ no puede describir curvas con tangente vertical.',
-      esVerdadero: false,
-      justificacion: 'La paramétrica **sí** admite tangentes verticales y curvas multivaluadas. Quien no puede es la forma explícita $y=f(x)$ (pendiente infinita).',
-    },
-    {
-      afirmacion: 'En un B-spline el grado del polinomio es independiente del número de puntos de control.',
+      afirmacion: 'Una superficie de Bézier se obtiene como producto tensorial de bases en $u$ y en $v$ sobre una malla de control $P_{ij}$.',
       esVerdadero: true,
-      justificacion: 'A diferencia de Bézier (grado $=$ nº puntos $-1$), en un B-spline se fija el grado $p$ y el vector de nudos aparte; se pueden añadir puntos sin subir el grado.',
+      justificacion: 'Correcto: $S(u,v)=\\sum_i\\sum_j B_i^m(u)\\,B_j^n(v)\\,P_{ij}$.',
     },
     {
-      afirmacion: 'El polinomio de Bernstein $B_i^n(t)=\\binom{n}{i}t^i(1-t)^{n-i}$ puede tomar valores negativos dentro de $[0,1]$.',
+      afirmacion: 'La representación explícita $y=f(x)$ puede describir curvas con tangente vertical y curvas multivaluadas.',
       esVerdadero: false,
-      justificacion: 'En $[0,1]$ es siempre $\\ge 0$ (producto de potencias no negativas). Esa no negatividad + la partición de la unidad garantizan la propiedad de envolvente convexa.',
+      justificacion: 'Detalle falso: quien puede es la **paramétrica** $P(t)$. La explícita $y=f(x)$ falla justo en tangentes verticales (pendiente infinita) y curvas multivaluadas.',
+    },
+    {
+      afirmacion: 'El algoritmo de De Casteljau necesita evaluar potencias de $t$ y coeficientes binomiales en cada paso.',
+      esVerdadero: false,
+      justificacion: 'Detalle falso: De Casteljau usa **solo interpolaciones lineales** ($\\text{lerp}$); no calcula binomios ni potencias. Eso es precisamente lo que lo hace estable.',
+    },
+    {
+      afirmacion: 'En un B-spline de grado $p$, en un nudo interior simple la curva mantiene continuidad $C^{p-1}$.',
+      esVerdadero: true,
+      justificacion: 'Correcto: es una de las ventajas del B-spline (continuidad alta automática); cada nudo repetido baja la continuidad en 1.',
+    },
+    {
+      afirmacion: 'Las curvas de Bézier son invariantes ante transformaciones afines: basta transformar sus puntos de control.',
+      esVerdadero: true,
+      justificacion: 'Correcto: gracias a la partición de la unidad, aplicar una afín a los $P_i$ equivale a aplicarla a toda la curva.',
+    },
+    {
+      afirmacion: 'Para una Bézier cúbica, la función base (peso) del punto de control $P_1$ es $2(1-t)\\,t$.',
+      esVerdadero: false,
+      justificacion: 'Detalle falso: $2(1-t)t$ es el peso central de la Bézier **cuadrática**. En la cúbica el peso de $P_1$ es $3(1-t)^2 t$.',
     },
   ],
 
+  // Clave repartida (C, A, D): ya no está siempre en la misma posición.
   opcionMultiple: [
     {
       q: 'El grado mínimo de curva que permite fijar posición y tangente en ambos extremos e incluir un punto de inflexión es:',
@@ -99,17 +102,17 @@ const examen: Examen = {
       dif: 'media',
     },
     {
-      q: 'El vector de nudos (knot vector) es propio de:',
-      opciones: ['Las curvas de Bézier', 'Los B-splines / NURBS', 'Las curvas de Hermite', 'Las rectas paramétricas'],
-      correcta: 1,
+      q: 'El vector de nudos (knot vector) es un elemento propio de:',
+      opciones: ['Los B-splines / NURBS', 'Las curvas de Bézier', 'Las curvas de Hermite', 'Las rectas paramétricas'],
+      correcta: 0,
       exp: 'El knot vector define los intervalos y el soporte local de cada función base B-spline; no existe en Bézier ni Hermite.',
       dif: 'media',
     },
     {
       q: 'Para lograr reflejos especulares continuos en una carrocería ("clase A") se busca continuidad:',
-      opciones: ['$C^0$', '$G^0$', '$C^2 / G^2$', 'Ninguna, basta con que se toquen'],
-      correcta: 2,
-      exp: '$C^2$ iguala las segundas derivadas ⇒ curvatura continua ⇒ los reflejos no muestran quiebres.',
+      opciones: ['$C^0$', '$G^0$', 'Ninguna, basta con que los tramos se toquen', '$C^2 / G^2$'],
+      correcta: 3,
+      exp: '$C^2/G^2$ iguala la curvatura ⇒ los reflejos no muestran quiebres. $C^0/G^0$ solo garantiza que los tramos se toquen.',
       dif: 'dificil',
     },
   ],

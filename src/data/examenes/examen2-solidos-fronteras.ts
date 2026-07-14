@@ -12,79 +12,82 @@ const examen: Examen = {
   temas: ['CSG', 'B-rep', 'Euler–Poincaré', 'Octrees / vóxeles', 'SDF', 'Barridos', 'Marching Cubes'],
   color: '#22d3ee',
 
+  // Enunciados difíciles: cada FALSO lo es por un único detalle (palabra, signo o número).
+  // Clave balanceada (7 V / 7 F) y en orden no predecible. Notación del curso: V-A+C (aristas, caras).
   verdaderoFalso: [
     {
-      afirmacion: 'La fórmula de Euler para un poliedro simple (sin agujeros) es $V - A + C = 2$, donde $V$=vértices, $A$=aristas y $C$=caras.',
+      afirmacion: 'Para un poliedro simple (género 0, sin agujeros) se cumple la fórmula de Euler $V - A + C = 2$, con $V$=vértices, $A$=aristas y $C$=caras.',
       esVerdadero: true,
-      justificacion: 'Es la característica de Euler de un sólido de género 0. Para un cubo: $8-12+6=2$. ✔',
+      justificacion: 'Correcto: p. ej. el cubo cumple $8-12+6=2$.',
     },
     {
-      afirmacion: 'La Geometría Constructiva de Sólidos (CSG) representa el objeto directamente por sus caras, aristas y vértices.',
+      afirmacion: 'La CSG describe el sólido como un árbol de operaciones booleanas sobre primitivas, mientras que la B-rep lo describe por sus caras, aristas y vértices.',
+      esVerdadero: true,
+      justificacion: 'Correcto: son las dos representaciones centrales del curso; suelen combinarse (modelar en CSG, evaluar a B-rep).',
+    },
+    {
+      afirmacion: 'En una B-rep, la geometría (coordenadas) y la topología (adyacencias) se almacenan juntas en una única estructura indivisible.',
       esVerdadero: false,
-      justificacion: 'Eso es la **representación de fronteras (B-rep)**. CSG describe el sólido como un **árbol de operaciones booleanas** (unión, intersección, diferencia) sobre primitivas.',
+      justificacion: 'Detalle falso: se guardan **por separado** (topología = qué se conecta con qué; geometría = posiciones). Esa separación permite compartir vértices y consultar adyacencias.',
     },
     {
-      afirmacion: 'En la representación de fronteras (B-rep) se almacenan por separado la geometría (coordenadas) y la topología (relaciones de adyacencia).',
+      afirmacion: 'Con el convenio usual, una función de distancia con signo (SDF) es negativa dentro del objeto, positiva fuera y cero sobre la superficie.',
       esVerdadero: true,
-      justificacion: 'La topología dice qué caras/aristas/vértices se conectan; la geometría da sus posiciones. Separarlas permite compartir vértices y consultar adyacencias.',
+      justificacion: 'Correcto: la superficie es el conjunto $d=0$; $|d|$ mide la distancia. Es la base del sphere tracing.',
     },
     {
-      afirmacion: 'La estructura winged-edge (arista alada) permite recorrer eficientemente las caras y vértices adyacentes a una arista.',
-      esVerdadero: true,
-      justificacion: 'Cada arista guarda punteros a sus dos vértices, sus dos caras y las aristas siguientes/anteriores en cada cara ⇒ navegación local rápida.',
-    },
-    {
-      afirmacion: 'Un modelo de alambre (wireframe) representa un sólido 3D sin ambigüedad.',
+      afirmacion: 'Un modelo de alambre (wireframe) representa un sólido 3D sin ambigüedad, distinguiendo con claridad su interior de su exterior.',
       esVerdadero: false,
-      justificacion: 'El wireframe solo guarda aristas: puede interpretarse de varias formas (p. ej. la ilusión de Necker). No distingue caras ni qué es interior/exterior.',
+      justificacion: 'Detalle falso: el wireframe es **ambiguo** (solo guarda aristas, no caras) y no distingue interior/exterior (ilusión de Necker).',
     },
     {
-      afirmacion: 'Las tres operaciones booleanas típicas de CSG son unión, intersección y diferencia.',
-      esVerdadero: true,
-      justificacion: 'Con $\\cup$, $\\cap$ y $-$ sobre primitivas (cubo, esfera, cilindro…) se construyen sólidos complejos en un árbol CSG.',
-    },
-    {
-      afirmacion: 'Un octree subdivide recursivamente el espacio en ocho octantes.',
-      esVerdadero: true,
-      justificacion: 'Es la versión 3D del quadtree: cada nodo lleno/vacío/mixto se parte en 8 hijos hasta la resolución deseada.',
-    },
-    {
-      afirmacion: 'La representación por vóxeles reproduce de forma exacta las fronteras curvas de un sólido.',
+      afirmacion: 'La diferencia booleana $A-B$ de dos objetos dados por SDF se calcula como $\\min(d_A,\\,d_B)$.',
       esVerdadero: false,
-      justificacion: 'Los vóxeles **aproximan** la frontera con "escalones" (aliasing 3D); ganar precisión exige más resolución y memoria ($O(n^3)$).',
+      justificacion: 'Detalle falso: $\\min$ es la **unión**. La diferencia $A-B$ es $\\max(d_A,\\,-d_B)$.',
     },
     {
-      afirmacion: 'Con el convenio habitual, una función de distancia con signo (SDF) es negativa dentro del objeto y positiva fuera.',
+      afirmacion: 'Un octree subdivide recursivamente el espacio 3D en ocho octantes; su análogo en 2D es el quadtree (cuatro cuadrantes).',
       esVerdadero: true,
-      justificacion: 'La superficie es el conjunto $d=0$. El signo indica dentro/fuera y $|d|$ la distancia; base del *sphere tracing*.',
+      justificacion: 'Correcto: octree = 8 hijos por nodo; quadtree = 4. Se subdivide hasta la resolución deseada.',
     },
     {
-      afirmacion: 'El algoritmo Marching Cubes extrae una malla poligonal (isosuperficie) a partir de un campo escalar 3D.',
-      esVerdadero: true,
-      justificacion: 'Recorre celdas cúbicas y, según qué vértices están dentro/fuera del umbral, genera triángulos usando una tabla de 256 casos.',
-    },
-    {
-      afirmacion: 'Un barrido por traslación (extrusión) genera un sólido moviendo un perfil 2D a lo largo de una trayectoria.',
-      esVerdadero: true,
-      justificacion: 'La extrusión desplaza el perfil; el barrido por **revolución** lo gira alrededor de un eje. Ambos son *sweep representations*.',
-    },
-    {
-      afirmacion: 'Para un toro (sólido con un agujero) también se cumple $V - A + C = 2$.',
+      afirmacion: 'La representación por vóxeles reproduce de forma exacta las fronteras curvas de un sólido, sin error de discretización.',
       esVerdadero: false,
-      justificacion: 'La fórmula general de Euler–Poincaré es $V-A+C=2-2g$ con $g$=género. Un toro tiene $g=1$ ⇒ $V-A+C=0$, no 2.',
+      justificacion: 'Detalle falso: los vóxeles **aproximan** la frontera con "escalones"; reducir el error exige más resolución y memoria ($O(n^3)$).',
     },
     {
-      afirmacion: 'Los operadores de Euler garantizan que las modificaciones a un B-rep mantengan un sólido topológicamente válido.',
+      afirmacion: 'En la estructura winged-edge, cada arista almacena sus dos vértices, sus dos caras (izquierda y derecha) y las aristas anterior y siguiente de cada cara.',
       esVerdadero: true,
-      justificacion: 'Operadores como MEV, MEF, etc. cambian $V,A,C$ respetando la relación de Euler–Poincaré, evitando mallas inconsistentes.',
+      justificacion: 'Correcto (Baumgart): esos punteros permiten navegar en tiempo constante entre caras, aristas y vértices adyacentes.',
     },
     {
-      afirmacion: 'La unión de dos objetos representados por SDF, $d_A$ y $d_B$, se obtiene con $\\min(d_A,d_B)$.',
+      afirmacion: 'El algoritmo Marching Cubes extrae una isosuperficie poligonal de un campo escalar 3D usando una tabla de casos según qué vértices de cada celda superan el umbral.',
       esVerdadero: true,
-      justificacion: 'Unión $=\\min$, intersección $=\\max$, diferencia $A-B=\\max(d_A,-d_B)$. Así se hacen booleanas directamente sobre las distancias.',
+      justificacion: 'Correcto: recorre celdas cúbicas y triangula según la configuración dentro/fuera de sus 8 vértices.',
+    },
+    {
+      afirmacion: 'El barrido por revolución genera un sólido desplazando (trasladando) un perfil 2D a lo largo de una recta.',
+      esVerdadero: false,
+      justificacion: 'Detalle falso: eso es el barrido por **traslación/extrusión**. El de **revolución** hace **girar** el perfil alrededor de un eje.',
+    },
+    {
+      afirmacion: 'Un octree ahorra memoria frente a una rejilla de vóxeles uniforme porque deja de subdividir las regiones homogéneas (totalmente llenas o vacías).',
+      esVerdadero: true,
+      justificacion: 'Correcto: solo los nodos mixtos se refinan, evitando el costo $O(n^3)$ de la rejilla densa.',
+    },
+    {
+      afirmacion: 'Para un toro (sólido con un agujero que lo atraviesa) también se cumple $V - A + C = 2$.',
+      esVerdadero: false,
+      justificacion: 'Detalle falso: la fórmula general de Euler–Poincaré es $V-A+C=2-2g$ (género $g$). El toro tiene $g=1$ ⇒ da **0**, no 2.',
+    },
+    {
+      afirmacion: 'La unión de dos objetos dados por SDF, $d_A$ y $d_B$, se obtiene con $\\max(d_A,\\,d_B)$.',
+      esVerdadero: false,
+      justificacion: 'Detalle falso: la unión es $\\min(d_A,\\,d_B)$; $\\max$ es la **intersección**.',
     },
   ],
 
+  // Clave repartida (B, D, A): ya no está siempre en la misma posición.
   opcionMultiple: [
     {
       q: 'Para modelar una pieza mecánica con muchos taladros y ranuras, la representación más natural es:',
@@ -94,16 +97,16 @@ const examen: Examen = {
       dif: 'media',
     },
     {
-      q: 'La intersección de dos SDF $d_A$ y $d_B$ se calcula como:',
-      opciones: ['$\\min(d_A,d_B)$', '$\\max(d_A,d_B)$', '$d_A+d_B$', '$|d_A-d_B|$'],
-      correcta: 1,
+      q: 'La intersección de dos objetos dados por SDF $d_A$ y $d_B$ se calcula como:',
+      opciones: ['$\\min(d_A,d_B)$', '$d_A+d_B$', '$|d_A-d_B|$', '$\\max(d_A,d_B)$'],
+      correcta: 3,
       exp: 'Un punto está en la intersección solo si está dentro de ambos (ambas distancias negativas); $\\max$ conserva la mayor (la más "afuera").',
       dif: 'media',
     },
     {
       q: 'La principal ventaja de un octree frente a una rejilla de vóxeles uniforme es:',
-      opciones: ['Siempre es exacto', 'Adapta la resolución: no subdivide las zonas homogéneas', 'No usa memoria', 'Solo sirve en 2D'],
-      correcta: 1,
+      opciones: ['Adapta la resolución: no subdivide las zonas homogéneas', 'Siempre es exacto', 'No usa memoria', 'Solo sirve en 2D'],
+      correcta: 0,
       exp: 'El octree deja de subdividir los nodos totalmente llenos o vacíos, ahorrando memoria frente a la rejilla densa $O(n^3)$.',
       dif: 'dificil',
     },

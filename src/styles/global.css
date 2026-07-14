@@ -301,6 +301,32 @@ table.data tr:hover td { background: rgba(255, 255, 255, 0.02); }
   .vf-btns { justify-content: flex-start; }
 }
 
+/* ---------- Videos recomendados ---------- */
+.vid-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin: 8px 0 6px; }
+.vid-card {
+  display: flex; flex-direction: column; background: var(--bg-card); border: 1px solid var(--border-soft);
+  border-radius: var(--radius); overflow: hidden; transition: 0.2s; color: var(--text);
+}
+.vid-card:hover { transform: translateY(-3px); border-color: var(--border); box-shadow: var(--shadow); text-decoration: none; }
+.vid-thumb { position: relative; aspect-ratio: 16 / 9; background: var(--bg-elev); overflow: hidden; }
+.vid-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vid-play {
+  position: absolute; inset: 0; margin: auto; width: 52px; height: 52px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 1.1rem; color: #fff;
+  background: rgba(0, 0, 0, 0.55); border: 2px solid rgba(255, 255, 255, 0.85); transition: 0.18s;
+}
+.vid-card:hover .vid-play { background: var(--bad); border-color: var(--bad); transform: scale(1.08); }
+.vid-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; }
+.vid-lang {
+  align-self: flex-start; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 2px 8px; border-radius: 999px;
+}
+.vid-lang.es { background: rgba(52, 211, 153, 0.14); color: var(--ok); border: 1px solid rgba(52, 211, 153, 0.3); }
+.vid-lang.sub { background: rgba(251, 191, 36, 0.14); color: var(--warn); border: 1px solid rgba(251, 191, 36, 0.3); }
+.vid-body h4 { margin: 0; font-size: 0.96rem; line-height: 1.35; }
+.vid-canal { margin: 0; font-size: 0.8rem; color: var(--text-mute); }
+.vid-more { display: inline-block; margin-top: 12px; font-weight: 600; font-size: 0.92rem; }
+
 /* ---------- Footer ---------- */
 .site-footer { border-top: 1px solid var(--border-soft); padding: 30px 0; margin-top: 40px; color: var(--text-mute); font-size: 0.88rem; }
 .site-footer .inner { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; }

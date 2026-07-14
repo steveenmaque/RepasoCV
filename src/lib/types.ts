@@ -15,6 +15,15 @@ export interface FormulaClave {
   desc: string;
 }
 
+/** Video didáctico recomendado (YouTube). idioma: 'es' = español, 'sub' = inglés subtitulable. */
+export interface Video {
+  titulo: string;
+  canal: string;
+  url: string;
+  idioma: 'es' | 'sub';
+  nota?: string; // p.ej. "Enfoque práctico en Blender"
+}
+
 export interface Pregunta {
   q: string;
   opciones: string[];

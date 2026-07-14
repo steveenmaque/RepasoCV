@@ -3,8 +3,10 @@ import Base from '../../layouts/Base.astro';
 import Bloques from '../../components/Bloques.astro';
 import Ejercicios from '../../components/Ejercicios.astro';
 import Quiz from '../../components/Quiz.astro';
+import Videos from '../../components/Videos.astro';
 import { display, inline } from '../../lib/render';
 import { todos, porSlug } from '../../data';
+import { videosPorSlug } from '../../data/videos';
 
 export function getStaticPaths() {
   return todos.map((t) => ({ params: { slug: t.slug } }));
@@ -14,6 +16,7 @@ const { slug } = Astro.params;
 const tema = porSlug[slug!];
 const secLabel = tema.seccion === 'teoria' ? 'Teoría' : 'Exposiciones';
 const secHref = tema.seccion === 'teoria' ? '/teoria' : '/exposiciones';
+const videos = videosPorSlug[tema.slug] ?? [];
 ---
 
 <Base title={`${tema.titulo} — RepasoCV`} description={tema.resumen} active={tema.seccion}>
@@ -39,6 +42,7 @@ const secHref = tema.seccion === 'teoria' ? '/teoria' : '/exposiciones';
       {tema.formulas.length > 0 && <a href="#formulas">Fórmulas clave</a>}
       <a href="#ejercicios">Ejercicios</a>
       <a href="#quiz">Cuestionario</a>
+      {videos.length > 0 && <a href="#videos">Videos</a>}
     </aside>
 
     <div class="content">
@@ -66,6 +70,15 @@ const secHref = tema.seccion === 'teoria' ? '/teoria' : '/exposiciones';
 
       <h2 class="block-title" id="quiz"><span class="ico">🧠</span> Cuestionario ({tema.preguntas.length} preguntas)</h2>
       <Quiz preguntas={tema.preguntas} id={`quiz-${tema.slug}`} />
+
+      {
+        videos.length > 0 && (
+          <>
+            <h2 class="block-title" id="videos"><span class="ico">🎬</span> Videos recomendados</h2>
+            <Videos videos={videos} query={tema.titulo} />
+          </>
+        )
+      }
     </div>
   </div>
 </Base>

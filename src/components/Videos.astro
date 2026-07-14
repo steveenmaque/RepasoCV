@@ -1,0 +1,48 @@
+---
+import type { Video } from '../lib/types';
+import { youtubeId } from '../data/videos';
+
+interface Props { videos: Video[]; query: string; }
+const { videos, query } = Astro.props;
+
+const buscar = `https://www.youtube.com/results?search_query=${encodeURIComponent(query + ' explicación español')}`;
+---
+
+<p class="vid-intro" style="color:var(--text-mute);font-size:0.9rem;">
+  Selección de videos en <b>español</b> (o en inglés con subtítulos automáticos disponibles) que
+  explican este tema. Se abren en YouTube en una pestaña nueva.
+</p>
+
+<div class="vid-grid">
+  {
+    videos.map((v) => {
+      const id = youtubeId(v.url);
+      return (
+        <a class="vid-card" href={v.url} target="_blank" rel="noopener noreferrer">
+          <div class="vid-thumb">
+            {id && (
+              <img
+                src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
+                alt={`Miniatura: ${v.titulo}`}
+                loading="lazy"
+                decoding="async"
+                width="480"
+                height="360"
+              />
+            )}
+            <span class="vid-play" aria-hidden="true">▶</span>
+          </div>
+          <div class="vid-body">
+            <span class={`vid-lang ${v.idioma}`}>{v.idioma === 'es' ? 'Español' : 'Inglés · subtítulos'}</span>
+            <h4>{v.titulo}</h4>
+            <p class="vid-canal">▶ {v.canal}{v.nota ? ` · ${v.nota}` : ''}</p>
+          </div>
+        </a>
+      );
+    })
+  }
+</div>
+
+<a class="vid-more" href={buscar} target="_blank" rel="noopener noreferrer">
+  🔎 Buscar más videos de «{query}» en YouTube →
+</a>
